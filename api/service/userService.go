@@ -45,8 +45,14 @@ func SignUp(c echo.Context) error {
 	password := HashPassword(*user.Password)
 	user.Password = &password
 
-	user.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-	user.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+	user.Created_at, err = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+	if err != nil {
+		return fmt.Errorf("failed to parse created_at time: %w", err)
+	}
+	user.Updated_at, err = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+	if err != nil {
+		return fmt.Errorf("failed to parse updated_at time: %w", err)
+	}
 	user.ID = primitive.NewObjectID()
 	user.User_id = user.ID.Hex()
 

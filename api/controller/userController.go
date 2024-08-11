@@ -5,7 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Setupe(e *echo.Echo) {
+func SetupUserRoutes(e *echo.Echo) {
 	{
 		// e.GET("", handler.GetUsers)
 		e.POST("/signup", handler.SignUp)

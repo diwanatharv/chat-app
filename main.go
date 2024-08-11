@@ -18,7 +18,7 @@ func main() {
 	e := echo.New()
 	// e.Use(middleware.Logger())
 
-	controller.Setupe(e)
+	controller.SetupUserRoutes(e)
 	authRoutes := e.Group("")
 	authRoutes.Use(middlewares.AuthenticationMiddleware)
 
