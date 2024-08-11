@@ -59,7 +59,7 @@ func SignUp(c echo.Context) error {
 	user.ID = primitive.NewObjectID()
 	user.User_id = user.ID.Hex()
 
-	token, refreshToken, _ := helper.GenerateAllTokens(*user.Email, *user.First_name, *user.Last_name, *user.User_type, user.User_id)
+	token, refreshToken, err := helper.GenerateAllTokens(*user.Email, *user.First_name, *user.Last_name, *user.User_type, user.User_id)
 	if err != nil {
 		return fmt.Errorf("failed to generate tokens: %w", err)
 	}
