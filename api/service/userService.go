@@ -6,7 +6,6 @@ import (
 	"chat-app/pkg/mongodb"
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -43,7 +42,10 @@ func SignUp(c echo.Context) error {
 		return fmt.Errorf("this email already exists")
 	}
 
-	password := HashPassword(*user.Password)
+	password, err := HashPassword(*user.Password)
+	if err != nil {
+		return fmt.Errorf("failed to encrypt password: %w", err)
+	}
 	user.Password = &password
 
 	user.Created_at, err = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
@@ -58,7 +60,9 @@ func SignUp(c echo.Context) error {
 	user.User_id = user.ID.Hex()
 
 	token, refreshToken, _ := helper.GenerateAllTokens(*user.Email, *user.First_name, *user.Last_name, *user.User_type, user.User_id)
-
+	if err != nil {
+		return fmt.Errorf("failed to generate tokens: %w", err)
+	}
 	user.Token = &token
 	user.Refresh_Token = &refreshToken
 
@@ -165,12 +169,12 @@ func GetUsers(c echo.Context) ([]model.User, error) {
 	return documents, nil
 }
 
-func HashPassword(password string) string {
+func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
-		log.Panic(err)
+		return "", err
 	}
-	return string(bytes)
+	return string(bytes), nil
 }
 
 func VerifyPassword(userPassword string, providedPassword string) (bool, string) {
