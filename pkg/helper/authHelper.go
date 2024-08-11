@@ -16,13 +16,13 @@ func CheckUserType(c echo.Context, role string) error {
 }
 
 func MatchUserTypeTOUId(c echo.Context, userId string) error {
-	userType := c.Get("user_type")
+	userType := c.Request().Header.Get("user_type")
 	uid := c.Get("uid")
 
 	if userType == "USER" && uid != userId {
 		err := errors.New("unauthorized to access this resource")
 		return err
 	}
-	err := CheckUserType(c, userType.(string))
+	err := CheckUserType(c, userType)
 	return err
 }

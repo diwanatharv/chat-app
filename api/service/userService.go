@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -26,11 +27,11 @@ func SignUp(c echo.Context) error {
 
 	var user model.User
 	if err := c.Bind(&user); err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": fmt.Sprintf("Request parsing failed: %s", err.Error())})
 	}
 
 	if err := validate.Struct(user); err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": fmt.Sprintf("Request validation failed: %s", err.Error())})
 	}
 
 	count, err := userCollection.CountDocuments(ctx, bson.M{"email": user.Email})
@@ -39,7 +40,7 @@ func SignUp(c echo.Context) error {
 	}
 
 	if count > 0 {
-		return fmt.Errorf("this email or phone number already exists")
+		return fmt.Errorf("this email already exists")
 	}
 
 	password := HashPassword(*user.Password)
