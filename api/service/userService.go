@@ -122,39 +122,6 @@ func Login(c echo.Context) (model.User, error) {
 func GetUsers(c echo.Context) ([]model.User, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
-
-	// recordPerPage, err := strconv.Atoi(c.QueryParam("recordPerPage"))
-	// if err != nil || recordPerPage < 1 {
-	// 	recordPerPage = 10
-	// }
-
-	// page, err := strconv.Atoi(c.QueryParam("page"))
-	// if err != nil || page < 1 {
-	// 	page = 1
-	// }
-
-	// startIndex := (page - 1) * recordPerPage
-
-	// matchStage := bson.D{{"$match", bson.D{{}}}}
-	// projectStage := bson.D{
-	// 	{"$project", bson.D{
-	// 		{"_id", 0},
-	// 		{"total_count", 1},
-	// 		{"user_items", bson.D{{"$slice", []interface{}{"$data", startIndex, recordPerPage}}}},
-	// 	}},
-	// }
-
-	// result, err := userCollection.Aggregate(ctx, mongo.Pipeline{
-	// 	matchStage, projectStage,
-	// })
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error occurred while listing user items: %w", err)
-	// }
-
-	// var allUsers []bson.M
-	// if err = result.All(ctx, &allUsers); err != nil {
-	// 	return nil, fmt.Errorf("error occurred while decoding user items: %w", err)
-	// }
 	var documents []model.User
 	cursor, err := userCollection.Find(ctx, bson.M{})
 	if err != nil {

@@ -13,7 +13,7 @@ type User struct {
 	Email         *string            `json:"email" validate:"email,required"`
 	User_type     *string            `json:"user_type" validate:"required,oneof=ADMIN USER"`
 	Avatar        *string            `json:"avatar"`
-	Phone         *string            `json:"phone" validate:"required"`
+	Phone         *string            `json:"phone" validate:"required,eq=10"`
 	Token         *string            `json:"token"`
 	Refresh_Token *string            `json:"refresh_token"`
 	Created_at    time.Time          `json:"created_at"`
