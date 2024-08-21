@@ -77,7 +77,7 @@ func (m *MessageContext) ProcessMessage(message string) {
 // RedisClient defines the methods for interacting with Redis.
 type RedisClient interface {
 	PublishMessage(channel string, message string) error
-	SubscribeToChannel(channel string, messageChannel chan<- string) error
+	SubscribeToChannel(ctx context.Context, channel string, messageChannel chan<- string) error
 	UnsubscribeFromChannel(channel string) error
 }
 
@@ -109,7 +109,8 @@ func (r *redisImpl) UnsubscribeFromChannel(channel string) error {
 
 // SubscribeToChannel subscribes to a Redis channel and sends messages to the provided channel.
 
-func (r *redisImpl) SubscribeToChannel(channel string, messageChannel chan<- string) error {
+func (r *redisImpl) SubscribeToChannel(ctx context.Context, channel string, messageChannel chan<- string) error {
+
 	pubsub := r.client.Subscribe(r.ctx, channel)
 	defer pubsub.Close()
 
@@ -117,7 +118,7 @@ func (r *redisImpl) SubscribeToChannel(channel string, messageChannel chan<- str
 		select {
 		case msg := <-pubsub.Channel():
 			messageChannel <- msg.Payload
-		case <-r.ctx.Done():
+		case <-ctx.Done(): // Context cancellation handling
 			return nil
 		}
 	}
