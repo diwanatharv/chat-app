@@ -41,7 +41,10 @@ func (s *WebSocketServer) HandleConnections(w http.ResponseWriter, r *http.Reque
 	defer func() {
 		conn.Close()
 		s.mu.Lock()
-		delete(s.clients, conn)
+		_, exists := s.clients[conn]
+		if exists {
+			delete(s.clients, conn)
+		}
 		s.mu.Unlock()
 	}()
 
