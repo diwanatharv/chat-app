@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -82,7 +81,7 @@ func (s *WebSocketServer) BroadcastMessage(msg []byte) {
 // method sets up a subscription to a Redis channel and ensures that any messages received on that channel are broadcast to all connected WebSocket clients. This allows for real-time message distribution from Redis to WebSocket clients.
 func (s *WebSocketServer) StartRedisSubscription() {
 	messageChannel := make(chan string)
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithCancel(context.Background()) // Use WithCancel instead of WithTimeout
 	defer cancel()
 
 	go func() {
@@ -93,6 +92,7 @@ func (s *WebSocketServer) StartRedisSubscription() {
 	}()
 
 	for msg := range messageChannel {
+		fmt.Println("Received message from Redis:", msg) // Debug log
 		s.BroadcastMessage([]byte(msg))
 	}
 }
