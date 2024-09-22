@@ -2,9 +2,8 @@ package main
 
 import (
 	"chat-app/api/controller"
-	"chat-app/api/handler"
+	"chat-app/pkg/config"
 	middlewares "chat-app/pkg/middleware"
-	cache "chat-app/pkg/redis"
 	"os"
 
 	"github.com/labstack/echo/v4/middleware"
@@ -14,20 +13,17 @@ import (
 
 func main() {
 	port := os.Getenv("PORT")
-
+	config.InitRedis()
 	if port == "" {
 		port = "8000"
 	}
 
 	e := echo.New()
 	e.Use(middleware.Logger())
+	go controller.StartRedisSubscription()
 
 	controller.SetupUserRoutes(e)
-	redisClient := cache.NewRedisClient()
-	wsServer := handler.NewWebSocketServer(redisClient)
-
-	go wsServer.StartRedisSubscription()
-
+	e.GET("/ws", controller.HandleWebSocketConnection)
 	authRoutes := e.Group("")
 	authRoutes.Use(middlewares.AuthenticationMiddleware)
 	// WebSocket route

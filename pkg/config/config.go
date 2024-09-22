@@ -2,29 +2,24 @@ package config
 
 import (
 	"context"
-	"sync"
+	"log"
 
 	"github.com/go-redis/redis/v8"
 )
 
-var (
-	RedisClient *redis.Client
-	once        sync.Once
-)
+var RedisClient *redis.Client
+var Ctx = context.Background()
 
-func init() {
-	RedisClient = GetRedisClient()
-}
-
-func GetRedisClient() *redis.Client {
-	once.Do(func() {
-		RedisClient = redis.NewClient(&redis.Options{
-			Addr: "localhost:6379",
-			// Other configurations like password, DB, etc.
-		})
+func InitRedis() {
+	RedisClient = redis.NewClient(&redis.Options{
+		Addr: "localhost:6379",
 	})
-	return RedisClient
-}
-func GetContext() context.Context {
-	return context.Background()
+
+	// Test connection
+	_, err := RedisClient.Ping(Ctx).Result()
+	if err != nil {
+		log.Fatalf("Could not connect to Redis: %v", err)
+	}
+
+	log.Println("Connected to Redis")
 }
