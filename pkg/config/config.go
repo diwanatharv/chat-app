@@ -12,7 +12,7 @@ var Ctx = context.Background()
 
 func InitRedis() {
 	RedisClient = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379", 
+		Addr: "localhost:6379",
 	})
 
 	// Test connection

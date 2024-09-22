@@ -26,6 +26,11 @@ func main() {
 	e.GET("/ws", controller.HandleWebSocketConnection)
 	authRoutes := e.Group("")
 	authRoutes.Use(middlewares.AuthenticationMiddleware)
+	// WebSocket route
+	e.GET("/ws", func(c echo.Context) error {
+		wsServer.HandleConnections(c.Response().Writer, c.Request())
+		return nil
+	})
 
 	e.Logger.Fatal(e.Start(":" + port))
 }
